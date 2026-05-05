@@ -1,0 +1,69 @@
+services:
+  nexus-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - N8N_WEBHOOK_URL=http://n8n:5678/webhook/research
+      - WEAVIATE_URL=http://weaviate:8080
+      - WEAVIATE_API_KEY=${WEAVIATE_API_KEY}
+      - PHOENIX_ENABLED=${PHOENIX_ENABLED:-false}
+      - PHOENIX_ENDPOINT=http://localhost:6006
+      - LOG_LEVEL=INFO
+    depends_on:
+      - weaviate
+    networks:
+      - nexus-network
+    volumes:
+      - .:/app
+    command: uvicorn nexus.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.25.0
+    ports:
+      - "8080:8080"
+    environment:
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+    volumes:
+      - weaviate-data:/var/lib/weaviate
+    networks:
+      - nexus-network
+
+  n8n:
+    image: n8nio/n8n:1.55.0
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - WEBHOOK_URL=http://localhost:5678
+    volumes:
+      - n8n-data:/home/node/.n8n
+    networks:
+      - nexus-network
+
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    ports:
+      - "6006:6006"
+    environment:
+      - PHOENIX_PORT=6006
+    networks:
+      - nexus-network
+    volumes:
+      - phoenix-data:/phoenix/data
+
+volumes:
+  weaviate-data:
+  n8n-data:
+  phoenix-data:
+
+networks:
+  nexus-network:
+    driver: bridge
