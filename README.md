@@ -1,6 +1,5 @@
-# Nexus
+# Nexus - Multi-Agent Research & Automation Engine
 ![Nexus Logo](./ui/assets/Logo.png)
-Multi-Agent Research & Automation Engine
 
 Nexus is a Multi-Agent Research & Automation Engine that implements a sophisticated agent workflow using LangGraph for iterative research tasks.
 
@@ -23,16 +22,19 @@ The workflow uses conditional looping where the evaluator decides whether to con
 - **Flexible Execution**: Supports both external n8n automation and local fallback for research execution
 - **Scalable Design**: Modular architecture allows easy addition of new agent types or workflow modifications
 - **Production Ready**: Includes proper error handling, timeouts, logging, and environment configuration
+- **Open Source**: Free to use, modify, and distribute under MIT License; built with open source technologies
 
 ## Technology Stack
 
-- **LangGraph**: For implementing the agent workflow and state management
-- **GPT-4o**: Language model powering the planner and evaluator agents
-- **n8n**: External automation service for executing research steps (with local fallback)
-- **Python**: Core implementation language
-- **FastAPI**: REST API interface for submitting research tasks
-- **Docker**: Containerization for easy deployment
-- **React**: Frontend UI for interacting with the system
+Nexus is built using open source technologies:
+
+- **LangGraph**: For implementing the agent workflow and state management (open source)
+- **GPT-4o**: Language model powering the planner and evaluator agents (via OpenAI API)
+- **n8n**: External automation service for executing research steps (with local fallback) (open source)
+- **Python**: Core implementation language (open source)
+- **FastAPI**: REST API interface for submitting research tasks (open source)
+- **Docker**: Containerization for easy deployment (open source)
+- **React**: Frontend UI for interacting with the system (open source)
 
 ## Installation
 
