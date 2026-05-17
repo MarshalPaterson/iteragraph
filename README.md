@@ -71,8 +71,19 @@ Nexus is built using open source technologies:
 
 4. Start the services:
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
+
+   This launches 4 containers:
+
+   | Service | URL | Description |
+   |---------|-----|-------------|
+   | **nexus-api** | http://localhost:8000 | FastAPI research engine |
+   | **weaviate** | http://localhost:8080 | Vector database for memory |
+   | **n8n** | http://localhost:5678 | Workflow automation |
+   | **phoenix** | http://localhost:6006 | Observability & tracing |
+
+   Docker internal hostnames (`n8n`, `weaviate`) are resolved within the `nexus-network` bridge network, so no changes to `.env` are needed when running with Docker Compose.
 
 ### Local Development
 
@@ -100,15 +111,10 @@ Nexus is built using open source technologies:
 
 4. Start the API server:
    ```bash
-   uvicorn nexus.main:app --reload
+   uvicorn nexus.api.main:app --reload
    ```
 
-5. Start the frontend (if applicable):
-   ```bash
-   cd ui
-   npm install
-   npm start
-   ```
+5. Start the frontend (if applicable): Double click the index.html in ui folder.
 
 The system will be accessible at http://localhost:8000 for the API and http://localhost:3000 for the frontend (if configured).
 
