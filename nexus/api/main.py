@@ -40,7 +40,9 @@ async def run_research(request: ResearchRequest):
             "research_data": None,
             "is_complete": False,
             "iterations": 0,
-            "max_iterations": request.max_iterations
+            "max_iterations": request.max_iterations,
+            "model": request.model,
+            "provider": request.provider
         }
         
         try:
@@ -60,7 +62,9 @@ async def run_research(request: ResearchRequest):
             plan=result.get("plan", []),
             research_data=result.get("research_data", ""),
             is_complete=result.get("is_complete", True),
-            iterations=result.get("iterations", 1)
+            iterations=result.get("iterations", 1),
+            model=result.get("model"),
+            provider=result.get("provider")
         )
 
 

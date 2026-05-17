@@ -8,12 +8,12 @@ Nexus is a Multi-Agent Research & Automation Engine that implements a sophistica
 ### 1. Agent Architecture
 - **LangGraph StateGraph**: Implements a directed graph workflow with nodes representing agent functions
 - **Iterative Processing**: Uses conditional edges to loop between planner, executor, and evaluator until completion criteria are met
-- **State Management**: Maintains agent state through TypedDict with fields for task, plan, research_data, completion status, and iteration counters
+- **State Management**: Maintains agent state through TypedDict with fields for task, plan, research_data, completion status, iteration counters, and selected model
 
 ### 2. Specialized Agents
 - **Research Planner**: 
   - Role: Breaks down high-level tasks into specific, actionable research steps
-  - Implementation: Uses LLM (GPT-4o) to generate JSON array of research steps
+  - Implementation: Uses LLM (configurable — GPT-4o or any OpenRouter model) to generate JSON array of research steps
   - Prompt Engineering: Structured prompt that defines expected output format
 
 - **n8n Executor**:
@@ -27,7 +27,7 @@ Nexus is a Multi-Agent Research & Automation Engine that implements a sophistica
   - Decision Logic: Returns boolean completion status with reasoning
 
 ### 3. AI/ML Technologies
-- **Language Model**: ChatOpenAI with GPT-4o model (temperature 0.7 for balanced creativity/consistency)
+- **Language Model**: ChatOpenAI with GPT-4o model (temperature 0.7 for balanced creativity/consistency). Model can be overridden via API — supports any OpenRouter model (including free open models).
 - **Structured Output**: JSON parsing with fallback handling for LLM responses
 - **Prompt Engineering**: Carefully crafted prompts for each agent role with clear instructions and examples
 
@@ -39,7 +39,7 @@ Nexus is a Multi-Agent Research & Automation Engine that implements a sophistica
 - **Logging**: Comprehensive logging for monitoring agent decisions and workflow progression
 
 ### 5. Data Structures
-- **AgentState TypedDict**: Defines the schema for state persistence between workflow steps
+- **AgentState TypedDict**: Defines the schema for state persistence between workflow steps (includes optional `model` field for model selection)
 - **Pydantic Models**: ResearchRequest and ResearchResponse for API validation and serialization
 - **Type Safety**: Strong typing throughout for reliable state transitions
 

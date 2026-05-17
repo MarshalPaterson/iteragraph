@@ -13,7 +13,18 @@ from .agent_state import AgentState
 
 logger = logging.getLogger(__name__)
 
-llm = ChatOpenAI(model="gpt-4o", temperature=0.7)
+def get_llm(model: str | None = None, provider: str | None = None):
+    kwargs = dict(model=model or "gpt-4o", temperature=0.7)
+    if provider == "openrouter":
+        kwargs["openai_api_base"] = "https://openrouter.ai/api/v1"
+        api_key = os.getenv("OPENROUTER_API_KEY")
+        if api_key:
+            kwargs["api_key"] = api_key
+    else:
+        base_url = os.getenv("OPENAI_BASE_URL")
+        if base_url:
+            kwargs["openai_api_base"] = base_url
+    return ChatOpenAI(**kwargs)
 
 
 def should_continue(state: AgentState) -> str:
@@ -26,6 +37,7 @@ def should_continue(state: AgentState) -> str:
 
 def research_planner(state: AgentState) -> AgentState:
     task = state["task"]
+    llm = get_llm(state.get("model"), state.get("provider"))
     
     prompt = f"""You are a Research Lead agent. Break down this task into specific research steps:
 
@@ -67,6 +79,7 @@ def n8n_executor(state: AgentState) -> AgentState:
 
 def evaluator(state: AgentState) -> AgentState:
     research = state.get("research_data", "")
+    llm = get_llm(state.get("model"), state.get("provider"))
     
     prompt = f"""Evaluate if the research data is sufficient for this task:
 

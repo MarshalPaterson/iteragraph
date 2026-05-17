@@ -32,6 +32,13 @@
       margin-bottom: 48px;
     }
     
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+      border-radius: 20px;
+    }
+
     h1 {
       font-size: 2.5rem;
       font-weight: 700;
@@ -83,6 +90,39 @@
       gap: 12px;
       margin-top: 16px;
       align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .provider-group {
+      display: flex;
+      gap: 4px;
+      background: #0a0a0f;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .provider-group input {
+      display: none;
+    }
+
+    .provider-group label {
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: #71717a;
+      transition: all 0.15s;
+    }
+
+    .provider-group input:checked + label {
+      background: #6366f1;
+      color: white;
+    }
+
+    .provider-group label:hover {
+      color: #e4e4e7;
     }
     
     .iteration-select {
@@ -93,6 +133,19 @@
       color: #e4e4e7;
       font-family: inherit;
       font-size: 0.875rem;
+      min-width: 150px;
+    }
+
+    .model-select {
+      flex: 1;
+      background: #0a0a0f;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #e4e4e7;
+      font-family: inherit;
+      font-size: 0.875rem;
+      min-width: 180px;
     }
     
     button {
@@ -266,6 +319,7 @@
 <body>
   <div class="container">
     <header>
+      <img src="./assets/Logo.png" alt="Nexus Logo" class="logo" />
       <h1>Nexus</h1>
       <p class="subtitle">Multi-Agent Research & Automation Engine</p>
     </header>
@@ -273,6 +327,15 @@
     <div class="input-section">
       <textarea id="taskInput" placeholder="What would you like to research? (e.g., 'Research the latest developments in AI agents')"></textarea>
       <div class="controls">
+        <div class="provider-group">
+          <input type="radio" id="providerOpenAI" name="provider" value="openai" checked onchange="onProviderChange()">
+          <label for="providerOpenAI">OpenAI</label>
+          <input type="radio" id="providerOpenRouter" name="provider" value="openrouter" onchange="onProviderChange()">
+          <label for="providerOpenRouter">OpenRouter</label>
+        </div>
+        <select id="model" class="model-select">
+          <option value="gpt-4o">GPT-4o</option>
+        </select>
         <select id="iterations" class="iteration-select">
           <option value="1">1 iteration</option>
           <option value="2" selected>2 iterations</option>
@@ -303,15 +366,70 @@
   </div>
   
   <script>
-    const API_URL = 'http://localhost:8000';
+    const API_URL = window.__API_URL__ || 'http://localhost:8000';
     let isRunning = false;
-    
+
+    const OPENAI_MODELS = [
+      'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'
+    ];
+
+    let openrouterModels = [];
+
+    async function loadModels() {
+      try {
+        const res = await fetch('https://openrouter.ai/api/v1/models');
+        const data = await res.json();
+        openrouterModels = (data.data || []).filter(m => {
+          const p = m.pricing || {};
+          return parseFloat(p.prompt) === 0 && parseFloat(p.completion) === 0;
+        });
+      } catch {
+        openrouterModels = [];
+      }
+      populateModelDropdown('openai');
+    }
+
+    function populateModelDropdown(provider) {
+      const select = document.getElementById('model');
+      select.innerHTML = '';
+      if (provider === 'openai') {
+        OPENAI_MODELS.forEach(id => {
+          const opt = document.createElement('option');
+          opt.value = id;
+          opt.textContent = id;
+          if (id === 'gpt-4o') opt.selected = true;
+          select.appendChild(opt);
+        });
+      } else {
+        if (openrouterModels.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = 'openrouter/free';
+          opt.textContent = 'Free Models Router';
+          select.appendChild(opt);
+        } else {
+          openrouterModels.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.id;
+            opt.textContent = m.name || m.id;
+            select.appendChild(opt);
+          });
+        }
+      }
+    }
+
+    function onProviderChange() {
+      const provider = document.querySelector('input[name="provider"]:checked').value;
+      populateModelDropdown(provider);
+    }
+
     async function runResearch() {
       if (isRunning) return;
       
       const task = document.getElementById('taskInput').value.trim();
       if (!task) return;
       
+      const provider = document.querySelector('input[name="provider"]:checked').value;
+      const model = document.getElementById('model').value;
       const maxIterations = parseInt(document.getElementById('iterations').value);
       const runBtn = document.getElementById('runBtn');
       const statusBadge = document.getElementById('statusBadge');
@@ -326,10 +444,13 @@
         const response = await fetch(`${API_URL}/research`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ task, max_iterations: maxIterations })
+          body: JSON.stringify({ task, max_iterations: maxIterations, model, provider })
         });
         
         const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || `Server error: ${response.status}`);
+        }
         displayResults(data);
       } catch (error) {
         alert('Error: ' + error.message);
@@ -345,19 +466,26 @@
     function displayResults(data) {
       document.getElementById('resultsSection').style.display = 'block';
       
-      document.getElementById('resultMeta').textContent = 
-        `${data.iterations} iteration${data.iterations > 1 ? 's' : ''}`;
+      const prov = data.provider || 'openai';
+      const mod = data.model || 'gpt-4o';
+      document.getElementById('resultMeta').textContent =
+        `${data.iterations || 1} iter · ${prov}: ${mod}`;
       
       const planList = document.getElementById('planList');
-      planList.innerHTML = data.plan.map((step, i) => `
-        <div class="plan-item">
-          <span class="plan-number">${i + 1}</span>
-          ${step}
-        </div>
-      `).join('');
+      const plan = data.plan || [];
+      planList.innerHTML = plan.length
+        ? plan.map((step, i) => `
+            <div class="plan-item">
+              <span class="plan-number">${i + 1}</span>
+              ${step}
+            </div>
+          `).join('')
+        : '<div class="empty-state">No plan generated</div>';
       
       document.getElementById('researchData').textContent = data.research_data || 'No results';
     }
+    
+    loadModels();
     
     async function searchMemory() {
       const query = document.getElementById('memorySearch').value.trim();

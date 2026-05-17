@@ -7,6 +7,7 @@ services:
       - "8000:8000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - N8N_WEBHOOK_URL=http://n8n:5678/webhook/research
       - WEAVIATE_URL=http://weaviate:8080
       - WEAVIATE_API_KEY=${WEAVIATE_API_KEY}

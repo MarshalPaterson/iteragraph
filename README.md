@@ -1,7 +1,7 @@
 # Nexus - Multi-Agent Research & Automation Engine
 ![Nexus Logo](./ui/assets/Logo.png)
 
-Nexus is a Multi-Agent Research & Automation Engine that implements a sophisticated agent workflow using LangGraph for iterative research tasks.
+Nexus is a Multi-Agent Research & Automation Engine that implements a sophisticated agent workflow using LangGraph for iterative research tasks. Supports both OpenAI and OpenRouter (free open models).
 
 ![Nexus System Architecture](./ui/assets/NexusSystemArch.png)
 
@@ -9,7 +9,7 @@ Nexus is a Multi-Agent Research & Automation Engine that implements a sophistica
 
 Nexus implements a multi-agent system using LangGraph's StateGraph architecture with three specialized agents working in an iterative loop:
 
-1. **Research Planner**: Breaks down high-level tasks into specific, actionable research steps using GPT-4o
+1. **Research Planner**: Breaks down high-level tasks into specific, actionable research steps using GPT-4o (or any OpenRouter model)
 2. **n8n Executor**: Executes research steps via external automation (n8n webhooks) with local fallback simulation
 3. **Evaluator**: Assesses whether research data sufficiently addresses the original task using LLM-based evaluation
 
@@ -29,7 +29,7 @@ The workflow uses conditional looping where the evaluator decides whether to con
 Nexus is built using open source technologies:
 
 - **LangGraph**: For implementing the agent workflow and state management (open source)
-- **GPT-4o**: Language model powering the planner and evaluator agents (via OpenAI API)
+- **GPT-4o**: Language model powering the planner and evaluator agents (via OpenAI / OpenRouter)
 - **n8n**: External automation service for executing research steps (with local fallback) (open source)
 - **Python**: Core implementation language (open source)
 - **FastAPI**: REST API interface for submitting research tasks (open source)
@@ -41,7 +41,7 @@ Nexus is built using open source technologies:
 ### Prerequisites
 - Docker and Docker Compose
 - Python 3.8+ (for local development)
-- OpenAI API key (for GPT-4o access)
+- OpenAI API key or OpenRouter API key (for LLM access)
 - n8n instance (optional, for external automation)
 
 ### Quick Start with Docker
@@ -55,12 +55,17 @@ Nexus is built using open source technologies:
 2. Configure environment variables:
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration (see example below)
+   # Edit .env with your configuration (see below)
    ```
 
 3. Example .env configuration:
    ```
+   # OpenAI (default for GPT-4o)
    OPENAI_API_KEY=sk-your-openai-api-key-here
+
+   # OpenRouter (for free/open models — optional)
+   OPENROUTER_API_KEY=sk-or-v1-your-openrouter-key-here
+
    N8N_WEBHOOK_URL=http://n8n:5678/webhook/research
    WEAVIATE_URL=http://weaviate:8080
    WEAVIATE_API_KEY=your-weaviate-key-here
@@ -100,9 +105,14 @@ Nexus is built using open source technologies:
 
 3. Example .env configuration:
    ```
+   # OpenAI (default for GPT-4o)
    OPENAI_API_KEY=sk-your-openai-api-key-here
-   N8N_WEBHOOK_URL=http://n8n:5678/webhook/research
-   WEAVIATE_URL=http://weaviate:8080
+
+   # OpenRouter (for free/open models — optional)
+   OPENROUTER_API_KEY=sk-or-v1-your-openrouter-key-here
+
+   N8N_WEBHOOK_URL=http://localhost:5678/webhook/research
+   WEAVIATE_URL=http://localhost:8080
    WEAVIATE_API_KEY=your-weaviate-key-here
    PHOENIX_ENABLED=true
    PHOENIX_ENDPOINT=http://localhost:6006
@@ -114,9 +124,16 @@ Nexus is built using open source technologies:
    uvicorn nexus.api.main:app --reload
    ```
 
-5. Start the frontend (if applicable): Double click the index.html in ui folder.
+5. Start the frontend dev server:
+   ```bash
+   cd ui
+   npm install
+   npm start
+   ```
 
-The system will be accessible at http://localhost:8000 for the API and http://localhost:3000 for the frontend (if configured).
+The system will be accessible at:
+- **API**: http://localhost:8000
+- **UI**: http://localhost:3000 (with live reload)
 
 ## License
 
