@@ -138,3 +138,7 @@ The system will be accessible at:
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Disclaimer
+
+This project is currently being refined and finalized.
