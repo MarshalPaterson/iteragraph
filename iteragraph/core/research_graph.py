@@ -123,4 +123,4 @@ def build_research_graph() -> StateGraph:
     return workflow.compile()
 
 
-nexus_app = build_research_graph()
+iteragraph_app = build_research_graph()

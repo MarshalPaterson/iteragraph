@@ -1,5 +1,5 @@
 services:
-  nexus-api:
+  iteragraph-api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,12 +15,12 @@ services:
       - PHOENIX_ENDPOINT=http://localhost:6006
       - LOG_LEVEL=INFO
     depends_on:
-      - weaviate
+       - weaviate
     networks:
-      - nexus-network
+       - iteragraph-network
     volumes:
       - .:/app
-    command: uvicorn nexus.api.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn iteragraph.api.main:app --host 0.0.0.0 --port 8000 --reload
 
   weaviate:
     image: cr.weaviate.io/semitechnologies/weaviate:1.25.0
@@ -33,7 +33,7 @@ services:
     volumes:
       - weaviate-data:/var/lib/weaviate
     networks:
-      - nexus-network
+      - iteragraph-network
 
   n8n:
     image: n8nio/n8n:1.55.0
@@ -47,7 +47,7 @@ services:
     volumes:
       - n8n-data:/home/node/.n8n
     networks:
-      - nexus-network
+      - iteragraph-network
 
   phoenix:
     image: arizephoenix/phoenix:latest
@@ -56,7 +56,7 @@ services:
     environment:
       - PHOENIX_PORT=6006
     networks:
-      - nexus-network
+      - iteragraph-network
     volumes:
       - phoenix-data:/phoenix/data
 
@@ -66,5 +66,5 @@ volumes:
   phoenix-data:
 
 networks:
-  nexus-network:
+  iteragraph-network:
     driver: bridge

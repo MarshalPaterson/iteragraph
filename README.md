@@ -1,13 +1,13 @@
-# Nexus - Multi-Agent Research & Automation Engine
-![Nexus Logo](./ui/assets/Logo.png)
+# iteragraph - Multi-Agent Research & Automation Engine
+![iteragraph Logo](./ui/assets/Logo.png)
 
-Nexus is a Multi-Agent Research & Automation Engine that implements a sophisticated agent workflow using LangGraph for iterative research tasks. Supports both OpenAI and OpenRouter (free open models).
+iteragraph is a Multi-Agent Research & Automation Engine that implements a sophisticated agent workflow using LangGraph for iterative research tasks. Supports both OpenAI and OpenRouter (free open models).
 
-![Nexus System Architecture](./ui/assets/NexusSystemArch.png)
+![iteragraph System Architecture](./ui/assets/iterativesystemarch.png)
 
 ## Architecture Overview
 
-Nexus implements a multi-agent system using LangGraph's StateGraph architecture with three specialized agents working in an iterative loop:
+iteragraph implements a multi-agent system using LangGraph's StateGraph architecture with three specialized agents working in an iterative loop:
 
 1. **Research Planner**: Breaks down high-level tasks into specific, actionable research steps using GPT-4o (or any OpenRouter model)
 2. **n8n Executor**: Executes research steps via external automation (n8n webhooks) with local fallback simulation
@@ -15,7 +15,7 @@ Nexus implements a multi-agent system using LangGraph's StateGraph architecture 
 
 The workflow uses conditional looping where the evaluator decides whether to continue planning or end based on completion status and iteration thresholds. This creates an intelligent, self-improving research pipeline that adapts based on evaluation feedback.
 
-## Why Use Nexus
+## Why Use iteragraph
 
 - **Automated Research**: Eliminates manual research steps by automating the entire research workflow
 - **Iterative Improvement**: Continuously refines research through evaluation feedback loops
@@ -26,7 +26,7 @@ The workflow uses conditional looping where the evaluator decides whether to con
 
 ## Technology Stack
 
-Nexus is built using open source technologies:
+iteragraph is built using open source technologies:
 
 - **LangGraph**: For implementing the agent workflow and state management (open source)
 - **GPT-4o**: Language model powering the planner and evaluator agents (via OpenAI / OpenRouter)
@@ -47,10 +47,10 @@ Nexus is built using open source technologies:
 ### Quick Start with Docker
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/nexus.git
-   cd nexus
-   ```
+    ```bash
+    git clone https://github.com/yourusername/iteragraph.git
+    cd iteragraph
+    ```
 
 2. Configure environment variables:
    ```bash
@@ -83,12 +83,12 @@ Nexus is built using open source technologies:
 
    | Service | URL | Description |
    |---------|-----|-------------|
-   | **nexus-api** | http://localhost:8000 | FastAPI research engine |
+   | **iteragraph-api** | http://localhost:8000 | FastAPI research engine |
    | **weaviate** | http://localhost:8080 | Vector database for memory |
    | **n8n** | http://localhost:5678 | Workflow automation |
    | **phoenix** | http://localhost:6006 | Observability & tracing |
 
-   Docker internal hostnames (`n8n`, `weaviate`) are resolved within the `nexus-network` bridge network, so no changes to `.env` are needed when running with Docker Compose.
+   Docker internal hostnames (`n8n`, `weaviate`) are resolved within the `iteragraph-network` bridge network, so no changes to `.env` are needed when running with Docker Compose.
 
 ### Local Development
 
@@ -120,9 +120,9 @@ Nexus is built using open source technologies:
    ```
 
 4. Start the API server:
-   ```bash
-   uvicorn nexus.api.main:app --reload
-   ```
+    ```bash
+    uvicorn iteragraph.api.main:app --reload
+    ```
 
 5. Start the frontend dev server:
    ```bash

@@ -1,7 +1,7 @@
-# Nexus Multi-Agent System - AI Concepts
+# iteragraph Multi-Agent System - AI Concepts
 
 ## Overview
-Nexus is a Multi-Agent Research & Automation Engine that implements a sophisticated agent workflow using LangGraph for iterative research tasks.
+iteragraph is a Multi-Agent Research & Automation Engine that implements a sophisticated agent workflow using LangGraph for iterative research tasks.
 
 ## Key AI Components
 

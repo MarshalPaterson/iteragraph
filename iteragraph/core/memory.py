@@ -2,6 +2,7 @@ import os
 import logging
 from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +23,21 @@ class VectorStore:
     def _init_client(self):
         try:
             import weaviate
-            self.client = weaviate.Client(
-                url=self.url,
-                auth_client_secret=weaviate.AuthApiKey(self.api_key) if self.api_key else None
+            from weaviate.auth import AuthApiKey
+
+            parsed = urlparse(self.url)
+            host = parsed.hostname or "localhost"
+            port = parsed.port or 8080
+            secure = parsed.scheme == "https"
+
+            self.client = weaviate.connect_to_custom(
+                http_host=host,
+                http_port=port,
+                http_secure=secure,
+                grpc_host=host,
+                grpc_port=50051,
+                grpc_secure=secure,
+                auth_credentials=AuthApiKey(self.api_key) if self.api_key else None,
             )
             logger.info(f"Connected to Weaviate at {self.url}")
         except Exception as e:
@@ -35,11 +48,11 @@ class VectorStore:
         if not self.client:
             logger.warning("Weaviate not initialized, skipping memory add")
             return False
-        
+
         try:
-            self.client.data_object.create(
+            self.client.data.insert(
+                data_object={"content": content, "metadata": metadata or {}},
                 class_name="ResearchMemory",
-                data_object={"content": content, "metadata": metadata or {}}
             )
             return True
         except Exception as e:
@@ -49,7 +62,7 @@ class VectorStore:
     def search(self, query: str, limit: int = 5) -> List[str]:
         if not self.client:
             return []
-        
+
         try:
             results = self.client.query.get(
                 "ResearchMemory",
@@ -59,6 +72,10 @@ class VectorStore:
         except Exception as e:
             logger.error(f"Search failed: {e}")
             return []
+
+    def close(self):
+        if self.client:
+            self.client.close()
 
 
 vector_store = VectorStore()

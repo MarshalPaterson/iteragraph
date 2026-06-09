@@ -2,15 +2,15 @@ import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from nexus.core.agent_state import ResearchRequest, ResearchResponse
-from nexus.core.research_graph import nexus_app
-from nexus.core.memory import vector_store
-from nexus.core.observability import observability
+from iteragraph.core.agent_state import ResearchRequest, ResearchResponse
+from iteragraph.core.research_graph import iteragraph_app
+from iteragraph.core.memory import vector_store
+from iteragraph.core.observability import observability
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Nexus Research Engine", version="1.0.0")
+app = FastAPI(title="iteragraph Research Engine", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,7 +23,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "Nexus"}
+    return {"status": "healthy", "service": "iteragraph"}
 
 
 @app.post("/research", response_model=ResearchResponse)
@@ -46,7 +46,7 @@ async def run_research(request: ResearchRequest):
         }
         
         try:
-            result = nexus_app.invoke(initial_state)
+            result = iteragraph_app.invoke(initial_state)
         except Exception as e:
             logger.error(f"Graph execution failed: {e}")
             raise HTTPException(status_code=500, detail=str(e))

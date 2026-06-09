@@ -1,7 +1,7 @@
 {
-  "name": "nexus-ui",
+  "name": "iteragraph-ui",
   "version": "1.0.0",
-  "description": "Nexus Research Engine UI",
+  "description": "iteragraph Research Engine UI",
   "scripts": {
     "start": "lite-server",
     "dev": "lite-server"
