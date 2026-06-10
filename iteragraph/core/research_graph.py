@@ -4,7 +4,7 @@ import logging
 from typing import Dict, Any
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 from langgraph.graph import StateGraph, END
 from langchain_openai import ChatOpenAI
@@ -18,9 +18,20 @@ def get_llm(model: str | None = None, provider: str | None = None):
     if provider == "openrouter":
         kwargs["openai_api_base"] = "https://openrouter.ai/api/v1"
         api_key = os.getenv("OPENROUTER_API_KEY")
-        if api_key:
-            kwargs["api_key"] = api_key
+        if not api_key:
+            raise ValueError(
+                "OPENROUTER_API_KEY is not set. "
+                "Add it to your .env file or set the environment variable."
+            )
+        kwargs["api_key"] = api_key
     else:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "OPENAI_API_KEY is not set. "
+                "Add it to your .env file or set the environment variable."
+            )
+        kwargs["api_key"] = api_key
         base_url = os.getenv("OPENAI_BASE_URL")
         if base_url:
             kwargs["openai_api_base"] = base_url
