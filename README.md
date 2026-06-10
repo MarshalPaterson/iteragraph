@@ -135,6 +135,8 @@ The system will be accessible at:
 - **API**: http://localhost:8000
 - **UI**: http://localhost:3000 (with live reload)
 
+![iteragraph UI](./ui/assets/UI.png)
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
